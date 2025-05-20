@@ -1,0 +1,54 @@
+// export const sendMonthlyReportEmail = async (recipientEmail) => {
+//   try {
+//     // Call your backend API to generate and send the report
+//     const response = await fetch("/api/reports/monthly", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ email: recipientEmail }),
+//     });
+
+//     if (!response.ok) {
+//       throw new Error("Failed to send report");
+//     }
+
+//     return await response.json();
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+export const sendMonthlyReportEmail = async (recipientEmail) => {
+  try {
+    // Use the deployed Apps Script URL from environment variables
+    const scriptUrl =
+      "https://script.google.com/macros/s/AKfycbzRifE_Q5P91CIhJ4j-tRqqgx4SD9j-sJIOcz6sMxdIZfmFKbrlquQvCNrqIKw5yi4Y7w/exec";
+
+    if (!scriptUrl) {
+      throw new Error(
+        "Apps Script URL not configured in environment variables"
+      );
+    }
+
+    const response = await fetch(scriptUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "monthly-report",
+        email: recipientEmail,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to send report");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending monthly report:", error);
+    throw error;
+  }
+};
